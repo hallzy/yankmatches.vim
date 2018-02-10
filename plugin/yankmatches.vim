@@ -4,7 +4,7 @@
 " License: This file is placed in the public domain.
 
 if exists('g:loaded_delete_matches')
-    finish
+  finish
 endif
 let g:loaded_delete_matches = 1
 
@@ -14,77 +14,77 @@ set cpoptions&vim
 
 
 function! ForAllMatches (command, options)
-    " Remember where we parked...
-    let l:orig_pos = getpos('.')
+  " Remember where we parked...
+  let l:orig_pos = getpos('.')
 
-    " Work out the implied range of lines to consider...
-    let l:in_visual = get(a:options, 'visual', 0)
-    let l:start_line = l:in_visual ? getpos("'<'")[1] : 1
-    let l:end_line   = l:in_visual ? getpos("'>'")[1] : line('$')
+  " Work out the implied range of lines to consider...
+  let l:in_visual = get(a:options, 'visual', 0)
+  let l:start_line = l:in_visual ? getpos("'<'")[1] : 1
+  let l:end_line   = l:in_visual ? getpos("'>'")[1] : line('$')
 
-    " Are we inverting the selection???
-    let l:inverted = get(a:options, 'inverse', 0)
+  " Are we inverting the selection???
+  let l:inverted = get(a:options, 'inverse', 0)
 
-    " Are we modifying the buffer???
-    let l:deleting = a:command ==? 'delete'
+  " Are we modifying the buffer???
+  let l:deleting = a:command ==? 'delete'
 
-    " Honour smartcase (which :lvimgrep doesn't, by default)
-    let l:sensitive = &ignorecase && &smartcase && @/ =~# '\u' ? '\C' : ''
+  " Honour smartcase (which :lvimgrep doesn't, by default)
+  let l:sensitive = &ignorecase && &smartcase && @/ =~# '\u' ? '\C' : ''
 
-    " Identify the lines to be operated on...
-    exec 'silent lvimgrep /' . l:sensitive . @/ . '/j %'
-    let l:matched_line_nums
-    \ = reverse(filter(map(getloclist(0), 'v:val.lnum'), 'l:start_line <= v:val && v:val <= l:end_line'))
+  " Identify the lines to be operated on...
+  exec 'silent lvimgrep /' . l:sensitive . @/ . '/j %'
+  let l:matched_line_nums
+  \ = reverse(filter(map(getloclist(0), 'v:val.lnum'), 'l:start_line <= v:val && v:val <= l:end_line'))
 
-    " Invert the list of lines, if requested...
-    if l:inverted
-        let l:inverted_line_nums = range(l:start_line, l:end_line)
-        for l:line_num in l:matched_line_nums
-            call remove(l:inverted_line_nums, l:line_num-l:start_line)
-        endfor
-        let l:matched_line_nums = reverse(l:inverted_line_nums)
-    endif
-
-    " Filter the original lines...
-    let l:yanked = ''
+  " Invert the list of lines, if requested...
+  if l:inverted
+    let l:inverted_line_nums = range(l:start_line, l:end_line)
     for l:line_num in l:matched_line_nums
-        " Remember yanks or deletions...
-        let l:yanked = getline(l:line_num) . "\n" . l:yanked
-
-        " Delete buffer lines if necessary...
-        if l:deleting
-            exec l:line_num . 'delete'
-        endif
+      call remove(l:inverted_line_nums, l:line_num-l:start_line)
     endfor
+    let l:matched_line_nums = reverse(l:inverted_line_nums)
+  endif
 
-    " Make yanked lines available for putting...
-    " First however, check if the user has configured the option to change the
-    " register that the information is yanked or deleted to. If no such
-    " configuration exists, then check the clipboard setting.
-    if !exists('g:YankMatches#ClipboardRegister')
-        let l:clipboard_flags = split(&clipboard, ',')
-        if index(l:clipboard_flags, 'unnamedplus') >= 0
-            let g:YankMatches#ClipboardRegister='+'
-        elseif index(l:clipboard_flags, 'unnamed') >= 0
-            let g:YankMatches#ClipboardRegister='*'
-        else
-            let g:YankMatches#ClipboardRegister='"'
-        endif
+  " Filter the original lines...
+  let l:yanked = ''
+  for l:line_num in l:matched_line_nums
+    " Remember yanks or deletions...
+    let l:yanked = getline(l:line_num) . "\n" . l:yanked
+
+    " Delete buffer lines if necessary...
+    if l:deleting
+      exec l:line_num . 'delete'
     endif
-    let l:command = ':let @' . g:YankMatches#ClipboardRegister . ' = yanked'
-    execute 'normal! ' . l:command . "\<cr>"
+  endfor
 
-    " Return to original position...
-    call setpos('.', l:orig_pos)
-
-    " Report results...
-    redraw
-    let l:match_count = len(l:matched_line_nums)
-    if l:match_count == 0
-        unsilent echo 'Nothing to ' . a:command . ' (no matches found)'
-    elseif l:deleting
-        unsilent echo l:match_count . (l:match_count > 1 ? ' fewer lines' : ' less line')
+  " Make yanked lines available for putting...
+  " First however, check if the user has configured the option to change the
+  " register that the information is yanked or deleted to. If no such
+  " configuration exists, then check the clipboard setting.
+  if !exists('g:YankMatches#ClipboardRegister')
+    let l:clipboard_flags = split(&clipboard, ',')
+    if index(l:clipboard_flags, 'unnamedplus') >= 0
+      let g:YankMatches#ClipboardRegister='+'
+    elseif index(l:clipboard_flags, 'unnamed') >= 0
+      let g:YankMatches#ClipboardRegister='*'
     else
-        unsilent echo l:match_count . ' line' . (l:match_count > 1 ? 's' : '') . ' yanked'
+      let g:YankMatches#ClipboardRegister='"'
     endif
+  endif
+  let l:command = ':let @' . g:YankMatches#ClipboardRegister . ' = yanked'
+  execute 'normal! ' . l:command . "\<cr>"
+
+  " Return to original position...
+  call setpos('.', l:orig_pos)
+
+  " Report results...
+  redraw
+  let l:match_count = len(l:matched_line_nums)
+  if l:match_count == 0
+    unsilent echo 'Nothing to ' . a:command . ' (no matches found)'
+  elseif l:deleting
+    unsilent echo l:match_count . (l:match_count > 1 ? ' fewer lines' : ' less line')
+  else
+    unsilent echo l:match_count . ' line' . (l:match_count > 1 ? 's' : '') . ' yanked'
+  endif
 endfunction
