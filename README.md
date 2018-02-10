@@ -48,4 +48,22 @@ defined by your `clipboard` setting, or it will revert to the default register
 
 All the visual mappings work the same, except that they will only yank or delete
 from the visually selected text instead of the whole file.
+
+### Configuration Options
+
+#### Override the Destination Default Destination Register
+
+By default, this plugin will save your matched text in the register defined by
+the `clipboard` setting, or if that isn't defined it will save in the `"`
+register.
+
+However, It is possible that a user may want to use a different register for
+this plugin.
+
+To configure the destination register to the `a` register for example:
+
+```vimscript
+let g:YankMatches#ClipboardRegister='a'
+```
+
 [yankmatches]: https://github.com/thoughtstream/Damian-Conway-s-Vim-Setup/blob/master/plugin/yankmatches.vim
