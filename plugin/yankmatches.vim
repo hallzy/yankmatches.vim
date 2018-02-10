@@ -13,29 +13,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 
-" Originally just:
-"       nmap <silent> dm  :g//delete<CR>
-" But that doesn't retain all deletes in the nameless register
-"
-" Then:
-"       nmap <silent> dm  :let @a = ""<CR>:g//delete A<CR>
-" But that doesn't seem to work :-(
-" So:
-
-
-"====[ Interface ]====================================================
-"
-" Change these if you want different commands for the specified actions...
-"
-nmap <silent> dm  :     call ForAllMatches('delete', {})<CR>
-nmap <silent> DM  :     call ForAllMatches('delete', {'inverse':1})<CR>
-nmap <silent> ym  :     call ForAllMatches('yank',   {})<CR>
-nmap <silent> YM  :     call ForAllMatches('yank',   {'inverse':1})<CR>
-vmap <silent> dm  :<C-U>call ForAllMatches('delete', {'visual':1})<CR>
-vmap <silent> DM  :<C-U>call ForAllMatches('delete', {'visual':1, 'inverse':1})<CR>
-vmap <silent> ym  :<C-U>call ForAllMatches('yank',   {'visual':1})<CR>
-vmap <silent> YM  :<C-U>call ForAllMatches('yank',   {'visual':1, 'inverse':1})<CR>
-
 function! ForAllMatches (command, options)
     " Remember where we parked...
     let orig_pos = getpos('.')
