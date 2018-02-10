@@ -16,7 +16,7 @@ To use this plugin, add the following lines (or some variant of them) to your
 `.vimrc` file (or, add a subset of these lines if you do not want all of the
 features).
 
-```vimscript
+```vim
 nnoremap <silent> dm  :     call ForAllMatches('delete', {})<CR>
 nnoremap <silent> dM  :     call ForAllMatches('delete', {'inverse':1})<CR>
 nnoremap <silent> ym  :     call ForAllMatches('yank',   {})<CR>
@@ -62,7 +62,7 @@ this plugin.
 
 To configure the destination register to the `a` register for example:
 
-```vimscript
+```vim
 let g:YankMatches#ClipboardRegister='a'
 ```
 
