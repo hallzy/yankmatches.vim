@@ -33,8 +33,8 @@ function! ForAllMatches (command, options)
 
   " Identify the lines to be operated on...
   exec 'silent lvimgrep /' . l:sensitive . @/ . '/j %'
-  let l:matched_line_nums
-  \ = reverse(filter(map(getloclist(0), 'v:val.lnum'), 'l:start_line <= v:val && v:val <= l:end_line'))
+  let l:matched_line_nums = reverse(filter(map(getloclist(0), 'v:val.lnum'),
+      \ 'l:start_line <= v:val && v:val <= l:end_line'))
 
   " Invert the list of lines, if requested...
   if l:inverted
@@ -83,8 +83,10 @@ function! ForAllMatches (command, options)
   if l:match_count == 0
     unsilent echo 'Nothing to ' . a:command . ' (no matches found)'
   elseif l:deleting
-    unsilent echo l:match_count . (l:match_count > 1 ? ' fewer lines' : ' less line')
+    unsilent echo l:match_count .
+        \ (l:match_count > 1 ? ' fewer lines' : ' less line')
   else
-    unsilent echo l:match_count . ' line' . (l:match_count > 1 ? 's' : '') . ' yanked'
+    unsilent echo l:match_count . ' line' .
+        \ (l:match_count > 1 ? 's' : '') . ' yanked'
   endif
 endfunction
