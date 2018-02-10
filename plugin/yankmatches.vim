@@ -40,7 +40,7 @@ function! ForAllMatches (command, options)
     if l:inverted
         let l:inverted_line_nums = range(l:start_line, l:end_line)
         for l:line_num in l:matched_line_nums
-            call remove(l:inverted_line_nums, l:line_num-1)
+            call remove(l:inverted_line_nums, l:line_num-l:start_line)
         endfor
         let l:matched_line_nums = reverse(l:inverted_line_nums)
     endif
